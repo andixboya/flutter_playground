@@ -1,6 +1,6 @@
 import '../../model/transaction.dart';
 import '../../widgets/stateless_widgets/new_transaction.dart';
-import '../../widgets/stateless_widgets/transaction_list.dart';
+import 'package:expense_calculator/widgets/stateless_widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
 
 class UserTransaction extends StatefulWidget {
