@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 class ElementGenerator {
   static TextField generateInputField(
-      String label, TextEditingController controller) {
+      String label, TextEditingController controller, TextInputType type,
+      {Function onEditCompleted}) {
     return TextField(
       decoration: InputDecoration(labelText: label),
       controller: controller,
+      keyboardType: type,
+      onEditingComplete: onEditCompleted,
+
       // onChanged: (val) => amountInput = val, // or you can pass func to which takes the data from the textField.
     );
   }
