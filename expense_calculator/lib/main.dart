@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData _setTheme() {
-    return ThemeData(
+    return ThemeData( 
         //96-7) addition of theme so that its accessible through context to every other widget.
         primarySwatch: Colors.green,
         accentColor: Colors
