@@ -33,7 +33,8 @@ class TransactionList extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
-                          color: Colors.purple,
+                          color: Theme.of(context)
+                              .primaryColor, // 96-7) here we set the primary context color.
                         ),
                       ),
                     ),
@@ -42,10 +43,9 @@ class TransactionList extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           transactions[i].title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline6, // 96-7) here we set the font+ style from theme.
                         ),
                         Text(
                           DateFormat.yMMMd().format(transactions[i].date),

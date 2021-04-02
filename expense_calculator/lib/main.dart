@@ -11,10 +11,41 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = _setTheme();
+
     return MaterialApp(
       title: 'Flutter App',
       home: MyHomePage(),
+      theme: theme,
     );
+  }
+
+  ThemeData _setTheme() {
+    return ThemeData(
+        //96-7) addition of theme so that its accessible through context to every other widget.
+        primarySwatch: Colors.green,
+        accentColor: Colors
+            .purple, // searches first for this, then for the primarySwatch.
+        fontFamily:
+            'Quicksand', // in order for this reference to work you need to set it in yml and have that file somwehere!
+        textTheme: ThemeData.light().textTheme.copyWith(
+                // previously it was title, because probably title uses  Head6 size?
+                // this way we override the styles for each TITLE property!
+                headline6: TextStyle(
+              fontFamily: 'OpenSans',
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            )),
+        appBarTheme: AppBarTheme(
+          // theme used specifically for appBar
+          textTheme: ThemeData.light().textTheme.copyWith(
+                headline6: TextStyle(
+                  fontFamily: 'OpenSans',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+        ));
   }
 }
 
@@ -38,6 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
       date: DateTime.now(),
     ),
   ];
+
   void _addNewTransaction(String txTitle, double txAmount) {
     final newTx = Transaction(
       title: txTitle,
@@ -74,6 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final body = this._generateBody();
     final floatingActionButton = IconButton(
         icon: Icon(Icons.add),
+        color: Theme.of(context).accentColor,
         onPressed: () =>
             _modalShowAddNewTransaction(context)); // 94. we add modalShow
 
@@ -86,22 +119,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   AppBar _generateAppBar(BuildContext context) {
     final textTitleWidget =
-        Text('My first app.', style: TextStyle(color: Colors.red));
+        //97-8) here we replace the color with the theme`s color. otherwise it wouldn not bind.
+        Text(
+      'My first app.',
+      // style: TextStyle(color: Theme.of(context).primaryColor)
+    );
     return AppBar(
       title: textTitleWidget,
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.add),
-          onPressed: () =>
-              _modalShowAddNewTransaction(context), // 94. addition of modalShow.
-          color: Colors.red,
+          onPressed: () => _modalShowAddNewTransaction(
+              context), // 94. addition of modalShow.
+          color: Theme.of(context).accentColor,
           highlightColor: Colors.green,
         )
       ],
     ); // using Appbar directly, since its props are final.
   }
 
-  Column _generateBody() {
+  Widget _generateBody() {
     final structureWidget = <Widget>[];
 
     final chartContainer = Container(
@@ -109,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
         color: Colors.blue,
         child: Text('This is CHAR',
             style: TextStyle(fontSize: 12, backgroundColor: Colors.green)),
-        // elevation: 4, ??
+        elevation: 4, // what is this thing
       ),
       width: double.infinity,
     );
@@ -119,15 +156,19 @@ class _MyHomePageState extends State<MyHomePage> {
     structureWidget.add(Column(
       // this was another stateful widget, but w.e.
       children: <Widget>[
-        NewTransaction(_addNewTransaction),
         TransactionList(_userTransactions),
       ],
     ));
 
-    return Column(
-      children: structureWidget,
-      mainAxisAlignment:
-          MainAxisAlignment.center, // this is new and interesting.
+    // added this wrapper, because it caused some stupid margin creation. column apparently has half display height as default or sth?
+    // this was added during scrolling, but i`ve forgotten?
+    // need to check what this was about again? 90 !!!
+    return SingleChildScrollView(
+      child: Column(
+        children: structureWidget,
+        mainAxisAlignment:
+            MainAxisAlignment.center, // this is new and interesting.
+      ),
     );
   }
 }
