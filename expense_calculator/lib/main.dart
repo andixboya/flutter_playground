@@ -146,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // userTrasaction now has its own separate state.
     structureWidget.add(Column(
       // this was another stateful widget, but w.e.
-      children: <Widget>[
+      children: <Widget>[ 
         TransactionList(_userTransactions),
       ],
     ));
