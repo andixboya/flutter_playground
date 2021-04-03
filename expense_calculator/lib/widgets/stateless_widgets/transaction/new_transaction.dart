@@ -1,4 +1,4 @@
-import '../../widgets/elements_generator/generator.dart';
+import '../../elements_generator/generator.dart';
 import 'package:flutter/material.dart';
 
 class NewTransaction extends StatefulWidget {

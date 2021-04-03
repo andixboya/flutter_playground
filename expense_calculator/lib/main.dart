@@ -1,5 +1,6 @@
-import 'package:expense_calculator/widgets/stateless_widgets/new_transaction.dart';
-import 'package:expense_calculator/widgets/stateless_widgets/transaction_list.dart';
+import 'package:expense_calculator/widgets/stateless_widgets/chart/chart.dart';
+import 'package:expense_calculator/widgets/stateless_widgets/transaction/new_transaction.dart';
+import 'package:expense_calculator/widgets/stateless_widgets/transaction/transaction_list.dart';
 import 'package:flutter/material.dart';
 
 import 'model/transaction.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData _setTheme() {
-    return ThemeData( 
+    return ThemeData(
         //96-7) addition of theme so that its accessible through context to every other widget.
         primarySwatch: Colors.green,
         accentColor: Colors
@@ -55,20 +56,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Transaction> _userTransactions = [
-    Transaction(
-      id: 't1',
-      title: 'New Shoes',
-      amount: 69.99,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'Weekly Groceries',
-      amount: 16.53,
-      date: DateTime.now(),
-    ),
-  ];
+  // 102-105 we`ll start with empty list, which will be replaced by an empty picture.
+  final List<Transaction> _userTransactions = [];
+
+  List<Transaction> get _recentTransactions {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          Duration(days: 7),
+        ),
+      );
+    }).toList();
+  }
 
   void _addNewTransaction(String txTitle, double txAmount) {
     final newTx = Transaction(
@@ -141,15 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _generateBody() {
     final structureWidget = <Widget>[];
 
-    final chartContainer = Container(
-      child: Card(
-        color: Colors.blue,
-        child: Text('This is CHAR',
-            style: TextStyle(fontSize: 12, backgroundColor: Colors.green)),
-        elevation: 4, // what is this thing
-      ),
-      width: double.infinity,
-    );
+    final chartContainer = Chart(_recentTransactions); // (103-105~) here we replace chart 
     structureWidget.add(chartContainer);
 
     // userTrasaction now has its own separate state.
