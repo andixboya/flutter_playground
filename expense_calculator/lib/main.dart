@@ -30,13 +30,16 @@ class MyApp extends StatelessWidget {
         fontFamily:
             'Quicksand', // in order for this reference to work you need to set it in yml and have that file somwehere!
         textTheme: ThemeData.light().textTheme.copyWith(
-                // previously it was title, because probably title uses  Head6 size?
-                // this way we override the styles for each TITLE property!
-                headline6: TextStyle(
-              fontFamily: 'OpenSans',
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            )),
+              // previously it was title, because probably title uses  Head6 size?
+              // this way we override the styles for each TITLE property!
+              headline6: TextStyle(
+                fontFamily: 'OpenSans',
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+              // 110) setting color for buttons within body, which is also nice!
+              button: TextStyle(color: Colors.white),
+            ),
         appBarTheme: AppBarTheme(
           // theme used specifically for appBar
           textTheme: ThemeData.light().textTheme.copyWith(
@@ -69,16 +72,24 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  void _addNewTransaction(String txTitle, double txAmount) {
+  void _addNewTransaction(
+      String txTitle, double txAmount, DateTime chosenDate) {
     final newTx = Transaction(
       title: txTitle,
       amount: txAmount,
-      date: DateTime.now(),
+      date: chosenDate,
       id: DateTime.now().toString(),
     );
 
     setState(() {
       _userTransactions.add(newTx);
+    });
+  }
+
+  // 110-113 adding delete func. which will be transferred to the list so it can delete tx.
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransactions.removeWhere((tx) => tx.id == id);
     });
   }
 
@@ -102,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Scaffold _generateMainWidgetTree(BuildContext context) {
     final appBar = this._generateAppBar(context);
-    final body = this._generateBody();
+    final body = this._generateBody(appBar);
     final floatingActionButton = IconButton(
         icon: Icon(Icons.add),
         color: Theme.of(context).accentColor,
@@ -137,19 +148,32 @@ class _MyHomePageState extends State<MyHomePage> {
     ); // using Appbar directly, since its props are final.
   }
 
-  Widget _generateBody() {
+  Widget _generateBody(AppBar appBar) {
     final structureWidget = <Widget>[];
 
-    final chartContainer = Chart(_recentTransactions); // (103-105~) here we replace chart 
-    structureWidget.add(chartContainer);
+    final chartContainer =
+        Chart(_recentTransactions); // (103-105~) here we replace chart
+
+    final deviceFullHeight = MediaQuery.of(context).size.height;
+    final supplementaryPaddingForDevice = MediaQuery.of(context).padding.top;
+
+    // 120: here we take size from the device (top_most_level) and the size is partial! without padding for device
+    //  and without appbar`s height!
+    final leftoverSpace = deviceFullHeight -
+        appBar.preferredSize.height -
+        supplementaryPaddingForDevice;
+
+    final _chartHeight = leftoverSpace * 0.3;
+    structureWidget.add(Container(
+      child: chartContainer,
+      height: _chartHeight,
+    ));
 
     // userTrasaction now has its own separate state.
-    structureWidget.add(Column(
-      // this was another stateful widget, but w.e.
-      children: <Widget>[ 
-        TransactionList(_userTransactions),
-      ],
-    ));
+    // 120) we separate the leftover space between transactionList and Chart!
+    structureWidget.add(Container(
+        child: TransactionList(_userTransactions, _deleteTransaction),
+        height: leftoverSpace * 0.7));
 
     // added this wrapper, because it caused some stupid margin creation. column apparently has half display height as default or sth?
     // this was added during scrolling, but i`ve forgotten?

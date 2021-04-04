@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 class TransactionList extends StatelessWidget {
   final List<Transaction> _transactions;
 
-  TransactionList(this._transactions);
+  TransactionList(this._transactions, this._deleteTransaction);
+
+  final Function _deleteTransaction;
 
   @override
   Widget build(BuildContext context) {
@@ -17,48 +19,36 @@ class TransactionList extends StatelessWidget {
             child: ListView.builder(
                 itemBuilder: (context, i) {
                   return Card(
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 15,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.purple,
-                              width: 2,
-                            ),
-                          ),
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            '\$${_transactions[i].amount.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: Theme.of(context)
-                                  .primaryColor, // 96-7) here we set the primary context color.
-                            ),
+                    elevation: 5,
+                    margin: EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 5,
+                    ),
+                    // 107) something like card but with built in layout within itself!
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        radius: 30,
+                        child: Padding(
+                          padding: EdgeInsets.all(6),
+                          child: FittedBox(
+                            child: Text('\$${_transactions[i].amount}'),
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              _transactions[i].title,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6, // 96-7) here we set the font+ style from theme.
-                            ),
-                            Text(
-                              DateFormat.yMMMd().format(_transactions[i].date),
-                              style: TextStyle(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
+                      title: Text(
+                        _transactions[i].title,
+                        style: Theme.of(context).textTheme.title,
+                      ),
+                      subtitle: Text(
+                        DateFormat.yMMMd().format(_transactions[i].date),
+                      ),
+                      // 110-113 here as trailing == at the end of the element an icon is added, which will delete the listed item.
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        color: Theme.of(context).errorColor,
+                        onPressed: () =>
+                            _deleteTransaction(_transactions[i].id),
+                      ),
                     ),
                   );
                 },
