@@ -2,10 +2,18 @@ import 'package:expense_calculator/widgets/stateless_widgets/chart/chart.dart';
 import 'package:expense_calculator/widgets/stateless_widgets/transaction/new_transaction.dart';
 import 'package:expense_calculator/widgets/stateless_widgets/transaction/transaction_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'model/transaction.dart';
 
 void main() {
+  // 123) lazy way to force your app. to have only some specific type of orientation.
+  // Of course the better way is to create a separate design just for landscape/portrait mode.
+
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations(
+  //     [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+
   runApp(MyApp());
 }
 
@@ -61,6 +69,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // 102-105 we`ll start with empty list, which will be replaced by an empty picture.
   final List<Transaction> _userTransactions = [];
+  bool _showChart = false;
 
   List<Transaction> get _recentTransactions {
     return _userTransactions.where((tx) {
@@ -150,9 +159,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _generateBody(AppBar appBar) {
     final structureWidget = <Widget>[];
-
-    final chartContainer =
-        Chart(_recentTransactions); // (103-105~) here we replace chart
+    // (103-105~) here we replace chart
+    final chartContainer = Chart(_recentTransactions);
 
     final deviceFullHeight = MediaQuery.of(context).size.height;
     final supplementaryPaddingForDevice = MediaQuery.of(context).padding.top;
@@ -163,17 +171,51 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar.preferredSize.height -
         supplementaryPaddingForDevice;
 
-    final _chartHeight = leftoverSpace * 0.3;
-    structureWidget.add(Container(
-      child: chartContainer,
-      height: _chartHeight,
-    ));
+    // final _chartHeight = leftoverSpace * 0.3;
 
-    // userTrasaction now has its own separate state.
-    // 120) we separate the leftover space between transactionList and Chart!
-    structureWidget.add(Container(
+    // 124) here we add a switch, which will hold state wether we should show chart or hide it.
+    final displayChartSwitch = Row(
+      children: <Widget>[
+        Text('Show Chart'),
+        Switch(
+            value:
+                _showChart, // what is reflected on the switch as value (binding).
+            onChanged: (value) {
+              setState(() {
+                this._showChart = value;
+              });
+            })
+      ],
+      mainAxisAlignment: MainAxisAlignment.center,
+    );
+
+//126) here we add another conditional which will dictate if we need a switch (which should be only in landscape!).
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final transactionList = Container(
         child: TransactionList(_userTransactions, _deleteTransaction),
-        height: leftoverSpace * 0.7));
+        height: leftoverSpace * 0.7);
+
+    if (isLandscape) {
+      structureWidget.add(displayChartSwitch);
+      // 124) here we make a conditional which to add , but so much for the adding, because it both needs to be inside...
+      this._showChart
+          ? structureWidget
+              // 124) since we are using if statement now onlyone element will be visible so we can occupy almost all of the sapce (or >0.7)
+              .add(
+                  Container(child: chartContainer, height: leftoverSpace * 0.7))
+          :
+          // // userTrasaction now has its own separate state.
+          // // 120) we separate the leftover space between transactionList and Chart!
+          structureWidget.add(transactionList);
+    } else if (!isLandscape) {
+      // here i use conditionals within the code , not within the build, which looks cleaner!
+      // 126) in case of portrait we want 0.3 given to chart and rest to list.
+      structureWidget
+          .add(Container(child: chartContainer, height: leftoverSpace * 0.3));
+      // 126)  and transaction list with its full height!
+      structureWidget.add(transactionList);
+    }
 
     // added this wrapper, because it caused some stupid margin creation. column apparently has half display height as default or sth?
     // this was added during scrolling, but i`ve forgotten?

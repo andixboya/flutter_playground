@@ -13,7 +13,7 @@ class TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _transactions.isEmpty
-        ? EmptyTransaction()
+        ? EmptyTransaction() // 125)  haha i`ve extracted it in a widget itself, so i won`t be making any changes!!!
         : Container(
             height: 200,
             child: ListView.builder(
