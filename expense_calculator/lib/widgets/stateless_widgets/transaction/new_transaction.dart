@@ -77,10 +77,20 @@ class _NewTransactionState extends State<NewTransaction> {
         'Amount', this._amountController, TextInputType.number,
         onEditCompleted: _validatedAddTransaction);
 
-    return Card(
+// 127) how to be considerated with the height of the keyboard so that you can actually type something in
+// basically you use overflow (SingleChildScollView) + add padding from media Query!
+// wrapper is added here so that the overflown content is scrollable
+    return SingleChildScrollView(
+        child: Card(
       elevation: 5,
       child: Container(
-        padding: EdgeInsets.all(10),
+        // 127) here we set the sides separately because it pops up from below!
+        padding: EdgeInsets.only(
+          top: 10,
+          left: 10,
+          right: 10,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 10,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
@@ -123,6 +133,6 @@ class _NewTransactionState extends State<NewTransaction> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

@@ -1,3 +1,6 @@
+// 130) here we`ll use Platform.IO? to check if we are running on ios and based on that boolean show some widget or hide others.
+import 'dart:io';
+
 import 'package:expense_calculator/widgets/stateless_widgets/chart/chart.dart';
 import 'package:expense_calculator/widgets/stateless_widgets/transaction/new_transaction.dart';
 import 'package:expense_calculator/widgets/stateless_widgets/transaction/transaction_list.dart';
@@ -123,12 +126,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Scaffold _generateMainWidgetTree(BuildContext context) {
     final appBar = this._generateAppBar(context);
     final body = this._generateBody(appBar);
-    final floatingActionButton = IconButton(
-        icon: Icon(Icons.add),
-        color: Theme.of(context).accentColor,
-        onPressed: () =>
-            _modalShowAddNewTransaction(context)); // 94. we add modalShow
 
+    // 130) depending on whether we are on mac we won`t display the add button, since its android specific!
+    final floatingActionButton = Platform.isIOS
+        ? Container()
+        // 94. we add modalShow
+        : FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: () => _modalShowAddNewTransaction(context),
+          );
     return Scaffold(
       appBar: appBar,
       body: body,
@@ -158,12 +164,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _generateBody(AppBar appBar) {
+    final mediaQuery = MediaQuery.of(context);
+
     final structureWidget = <Widget>[];
     // (103-105~) here we replace chart
     final chartContainer = Chart(_recentTransactions);
 
-    final deviceFullHeight = MediaQuery.of(context).size.height;
-    final supplementaryPaddingForDevice = MediaQuery.of(context).padding.top;
+    final deviceFullHeight = mediaQuery.size.height;
+    final supplementaryPaddingForDevice = mediaQuery.padding.top;
 
     // 120: here we take size from the device (top_most_level) and the size is partial! without padding for device
     //  and without appbar`s height!
@@ -177,7 +185,9 @@ class _MyHomePageState extends State<MyHomePage> {
     final displayChartSwitch = Row(
       children: <Widget>[
         Text('Show Chart'),
-        Switch(
+        // 130) and here some widgets offer addaptive constructor, which automatically checks the os and adjusts to that!
+        // too bad I can`t test it since, I don`t have a mac.
+        Switch.adaptive(
             value:
                 _showChart, // what is reflected on the switch as value (binding).
             onChanged: (value) {
@@ -190,8 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
 //126) here we add another conditional which will dictate if we need a switch (which should be only in landscape!).
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
     final transactionList = Container(
         child: TransactionList(_userTransactions, _deleteTransaction),
         height: leftoverSpace * 0.7);

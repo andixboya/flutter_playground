@@ -43,12 +43,21 @@ class TransactionList extends StatelessWidget {
                         DateFormat.yMMMd().format(_transactions[i].date),
                       ),
                       // 110-113 here as trailing == at the end of the element an icon is added, which will delete the listed item.
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete),
-                        color: Theme.of(context).errorColor,
-                        onPressed: () =>
-                            _deleteTransaction(_transactions[i].id),
-                      ),
+                      // 128) depending on the device width (like in landscape orientation) we`ll add a label (as textWidget).
+                      trailing: MediaQuery.of(context).size.width > 460
+                          ? FlatButton.icon(
+                              icon: Icon(Icons.delete),
+                              label: Text('Delete'),
+                              textColor: Theme.of(context).errorColor,
+                              onPressed: () =>
+                                  _deleteTransaction(_transactions[i].id),
+                            )
+                          : IconButton(
+                              icon: Icon(Icons.delete),
+                              color: Theme.of(context).errorColor,
+                              onPressed: () =>
+                                  _deleteTransaction(_transactions[i].id),
+                            ),
                     ),
                   );
                 },
