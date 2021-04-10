@@ -5,7 +5,6 @@ import 'package:expense_calculator/widgets/stateless_widgets/chart/chart.dart';
 import 'package:expense_calculator/widgets/stateless_widgets/transaction/new_transaction.dart';
 import 'package:expense_calculator/widgets/stateless_widgets/transaction/transaction_list.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'model/transaction.dart';
 
@@ -69,7 +68,29 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+// 147-149) adding mixin(interface?) so that we can access the app`s lifecycle
+// with WidgetsBindingObserver
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  // 147-149) initState of the widget adds observer, so that we can access the app`s lifecycle.
+  @override
+  void initState() {
+    // WidgetsBinding is used to tap into the state of the app.
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+  }
+
+  // 147-149) here we can use dispose to unsubscribe/remove/dispose of the listener for states.
+  @override
+  dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   // 102-105 we`ll start with empty list, which will be replaced by an empty picture.
   final List<Transaction> _userTransactions = [];
   bool _showChart = false;
@@ -85,7 +106,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _addNewTransaction(
-      String txTitle, double txAmount, DateTime chosenDate) {
+    String txTitle,
+    double txAmount,
+    DateTime chosenDate,
+  ) {
     final newTx = Transaction(
       title: txTitle,
       amount: txAmount,
@@ -132,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ? Container()
         // 94. we add modalShow
         : FloatingActionButton(
-            child: Icon(Icons.add),
+            child: const Icon(Icons.add), // 144) micro-improvements
             onPressed: () => _modalShowAddNewTransaction(context),
           );
     return Scaffold(
@@ -184,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // 124) here we add a switch, which will hold state wether we should show chart or hide it.
     final displayChartSwitch = Row(
       children: <Widget>[
-        Text('Show Chart'),
+        const Text('Show Chart'),
         // 130) and here some widgets offer addaptive constructor, which automatically checks the os and adjusts to that!
         // too bad I can`t test it since, I don`t have a mac.
         Switch.adaptive(
