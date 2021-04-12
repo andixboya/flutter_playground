@@ -17,7 +17,7 @@ class CategoryMealsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 164) *** THIS IS HOW YOU SHOULD BE DOING THINGS( the above way is not the correct one!)
-    // here you tell it what object it should be (the map!)
+    // here you tell it what object it should be (the map!) 
     final routeArgs =
         ModalRoute.of(context).settings.arguments as Map<String, String>;
     final categoryTitle = routeArgs['title'];
