@@ -14,7 +14,12 @@ class CategoriesScreen extends StatelessWidget {
       // 160) here we extract data and map it , so it can be visualized.
       body: GridView(
         children: DUMMY_CATEGORIES
-            .map((catData) => CategoryItem(catData.title, catData.color))
+        // 162-164) each item redirects to a categoryScreen.
+            .map((catData) => CategoryItem(
+                    catData.id,
+                    catData.title,
+                    catData.color,
+                  ))
             .toList(),
         // 158) means you`ll have slider on your grids? And also gridDelegate is required.
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
