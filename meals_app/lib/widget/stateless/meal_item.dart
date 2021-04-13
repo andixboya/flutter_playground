@@ -101,7 +101,7 @@ class MealItem extends StatelessWidget {
                       title,
                       style: TextStyle(
                         fontSize: 26,
-                        color: Colors.white,
+                        color: Colors.white, 
                       ),
                       // 168-169) interesting stylization!
                       // in case its overflowing it should hide it.
