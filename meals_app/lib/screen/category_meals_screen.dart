@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meals_app/data/dummy_data.dart';
+import 'package:meals_app/widget/stateless/meal_item.dart';
 
 class CategoryMealsScreen extends StatelessWidget {
   // 163) !!!!
@@ -7,10 +9,10 @@ class CategoryMealsScreen extends StatelessWidget {
   // while the below way, you don`t have to pass any args.
   // On one hand you pass them through constructor, on the other , you pass them through namedRoutes and GET PARAMS FROM CONTEXT!
   //  [imp/164] BUT , with named routes you have information all gathered within the main App starting widget!
-  final String categoryId;
-  final String categoryTitle;
+  // final String categoryId;
+  // final String categoryTitle;
 
-  CategoryMealsScreen(this.categoryId, this.categoryTitle);
+  // CategoryMealsScreen(this.categoryId, this.categoryTitle);
   //  this is the alternative way to pass args!
 
   static const routeName = '/category-meals';
@@ -22,14 +24,28 @@ class CategoryMealsScreen extends StatelessWidget {
         ModalRoute.of(context).settings.arguments as Map<String, String>;
     final categoryTitle = routeArgs['title'];
     final categoryId = routeArgs['id'];
+    
+    // 167-169) => here we include the meals from our 'data'
+    final categoryMeals = DUMMY_MEALS.where((meal) {
+      return meal.categories.contains(categoryId);
+    }).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(categoryTitle),
       ),
-      body: Center(
-        child: Text(
-          'The Recipes For The Category!',
-        ),
+      body: ListView.builder(
+        // 167-169) and here we put them within the widget
+        itemBuilder: (ctx, index) {
+          return MealItem(
+            title: categoryMeals[index].title,
+            imageUrl: categoryMeals[index].imageUrl,
+            duration: categoryMeals[index].duration,
+            affordability: categoryMeals[index].affordability,
+            complexity: categoryMeals[index].complexity,
+          );
+        },
+        itemCount: categoryMeals.length,
       ),
     );
   }

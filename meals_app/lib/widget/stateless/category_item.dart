@@ -14,6 +14,8 @@ class CategoryItem extends StatelessWidget {
     Navigator.of(ctx).pushNamed(
       // 162-164) from context we get the route`s name!
       // then the appModule(material) gets the info and reroutes it.
+      // DO IT LIKE THIS!
+      // + HERE YOU can changge the routeName and if you do , it will be ONLY on one place!
       CategoryMealsScreen.routeName,
       arguments: {
         'id': id,
@@ -23,13 +25,13 @@ class CategoryItem extends StatelessWidget {
   }
   // 163)  the below way is also an option but you have no global chekc on how things are done
   // its more like a quick solution!!
-  void selectCategoryWithScreenPush(BuildContext ctx){
+  // void selectCategoryWithScreenPush(BuildContext ctx){
     // 163) here we use context.push, while with the other way we use namedRoutes(not just pilnig them up on top)
     // 163) also they are pushed through the CONSTRUCTOR!
-    Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
-      return CategoryMealsScreen(id, title);
-    }));
-  }
+    // Navigator.of(ctx).push(MaterialPageRoute(builder: (_){
+      // return CategoryMealsScreen(id, title);
+    // }));
+  // }
 
   @override
   Widget build(BuildContext context) {
