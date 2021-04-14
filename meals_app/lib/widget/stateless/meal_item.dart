@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:meals_app/model/meal.dart';
+import 'package:meals_app/screen/meal_detail_screen.dart';
 
 class MealItem extends StatelessWidget {
+  // 170-171) we add id , so we can link it  and then pass it to next widget .
+  final String id;
   final String title;
   final String imageUrl;
   final int duration;
@@ -9,6 +12,8 @@ class MealItem extends StatelessWidget {
   final Affordability affordability;
 
   MealItem({
+    // check id prop.
+    @required this.id,
     @required this.title,
     @required this.imageUrl,
     @required this.affordability,
@@ -50,13 +55,18 @@ class MealItem extends StatelessWidget {
     }
   }
 
-  void selectMeal() {}
+  // 170-171 the link is done via pushNamed! (you don`t need any {id}, because you are passing args here directly)
+  // + it points to a widget, not a page!
+  void selectMeal(BuildContext context) {
+    // 170-171) we also push some args necessary for the details page through arguments!
+    Navigator.of(context).pushNamed(MealDetailScreen.routeName, arguments: id);
+  }
 
   @override
   Widget build(BuildContext context) {
     // 166-169) inkwell is used to attach eventListener for re-directing later on.
     return InkWell(
-      onTap: selectMeal,
+      onTap: () => selectMeal(context),
       child: Card(
         // 168-169) you can choose the form of the card
         shape: RoundedRectangleBorder(
@@ -101,7 +111,7 @@ class MealItem extends StatelessWidget {
                       title,
                       style: TextStyle(
                         fontSize: 26,
-                        color: Colors.white, 
+                        color: Colors.white,
                       ),
                       // 168-169) interesting stylization!
                       // in case its overflowing it should hide it.
