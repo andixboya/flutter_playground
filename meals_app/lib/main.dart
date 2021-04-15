@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         //     MaterialPageRoute(builder: (ctx) => CategoriesScreen()),
 
         // 170-171) => in case nothing is found,  what should be visualized! (as last resort, like not found!)
-        // [imp/]  should return a MaterialPageRoute! 
+        // [imp/]  should return a MaterialPageRoute!
         onUnknownRoute: (settings) {
           return MaterialPageRoute(builder: (ctx) => CategoriesScreen());
         },

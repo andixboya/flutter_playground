@@ -33,69 +33,70 @@ class MealDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // 170-171) => here we get the id from the args, given through context.
     final mealId = ModalRoute.of(context).settings.arguments as String;
-    // final selectedMeal = DUMMY_MEALS.firstWhere((meal) => meal.id == mealId);
 
+    final selectedMeal = DUMMY_MEALS.firstWhere((meal) => meal.id == mealId);
+
+    //172) here we add additional info about our details page.
     return Scaffold(
       appBar: AppBar(
-        title: Text('Test title'),
+        title: Text('${selectedMeal.title}'),
       ),
-      body: Center(
-        child: Text('meal'),
+      // 172) this is important, as it gives scrolling for a screen , lets say.
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            // 172) this is the one for the image.
+            Container(
+              height: 300,
+              width: double.infinity,
+              child: Image.network(
+                selectedMeal.imageUrl,
+                fit: BoxFit.cover,
+              ),
+            ),
+            // 172) title will always be the same.
+            buildSectionTitle(context, 'Ingredients'),
+            buildContainer(
+              ListView.builder(
+                itemBuilder: (ctx, index) => Card(
+                  color: Theme.of(context).accentColor,
+                  child: Padding(
+                      // 172) symmetric was used for top/bot + left/right
+                      padding: EdgeInsets.symmetric(
+                        vertical: 5,
+                        horizontal: 10,
+                      ),
+                      child: Text(selectedMeal.ingredients[index])),
+                ),
+                itemCount: selectedMeal.ingredients.length,
+              ),
+            ),
+            buildSectionTitle(context, 'Steps'),
+            // 172) this is also important , as it gives you scrolling for multiple elements
+            // remember to always add a container, as it needs a fixed height, otherwise it will occupy all of it!
+            buildContainer(
+              ListView.builder(
+                itemBuilder: (ctx, index) => Column(
+                  children: [
+                    // 172) this was done in the previous section its like a small card
+                    ListTile(
+                      leading: CircleAvatar(
+                        child: Text('# ${(index + 1)}'),
+                      ),
+                      title: Text(
+                        selectedMeal.steps[index],
+                      ),
+                    ),
+                    // 172) layout widget, which gives us a thin line separator.
+                    Divider()
+                  ],
+                ),
+                itemCount: selectedMeal.steps.length,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-//  Scaffold(
-//       appBar: AppBar(
-//         title: Text('${selectedMeal.title}'),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Column(
-//           children: <Widget>[
-//             Container(
-//               height: 300,
-//               width: double.infinity,
-//               child: Image.network(
-//                 selectedMeal.imageUrl,
-//                 fit: BoxFit.cover,
-//               ),
-//             ),
-//             buildSectionTitle(context, 'Ingredients'),
-//             buildContainer(
-//               ListView.builder(
-//                 itemBuilder: (ctx, index) => Card(
-//                   color: Theme.of(context).accentColor,
-//                   child: Padding(
-//                       padding: EdgeInsets.symmetric(
-//                         vertical: 5,
-//                         horizontal: 10,
-//                       ),
-//                       child: Text(selectedMeal.ingredients[index])),
-//                 ),
-//                 itemCount: selectedMeal.ingredients.length,
-//               ),
-//             ),
-//             buildSectionTitle(context, 'Steps'),
-//             buildContainer(
-//               ListView.builder(
-//                 itemBuilder: (ctx, index) => Column(
-//                   children: [
-//                     ListTile(
-//                       leading: CircleAvatar(
-//                         child: Text('# ${(index + 1)}'),
-//                       ),
-//                       title: Text(
-//                         selectedMeal.steps[index],
-//                       ),
-//                     ),
-//                     Divider()
-//                   ],
-//                 ),
-//                 itemCount: selectedMeal.steps.length,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
