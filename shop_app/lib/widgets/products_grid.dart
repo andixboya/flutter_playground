@@ -10,7 +10,7 @@ class ProductsGrid extends StatelessWidget {
     // and it is the only one that gets rebuilt.
     final productsData = Provider.of<Products>(context);
     final products = productsData.items;
-
+  
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       itemCount: products.length,
