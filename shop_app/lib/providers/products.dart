@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/models/product.dart';
-import 'package:shop_app/widgets/products_grid.dart';
 
-class ProductsOverviewScreen extends StatelessWidget {
-  // 185-193) initial context.
-  final List<Product> loadedProducts = [
+// 193-196) this is like the state providr class, whic need ChangeNotifier 
+// in order to notify the selected widgets.
+class Products with ChangeNotifier {
+  List<Product> _items = [
     Product(
       id: 'p1',
       title: 'Red Shirt',
@@ -39,12 +39,19 @@ class ProductsOverviewScreen extends StatelessWidget {
     ),
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('MyShop'),
-        ),
-        body: ProductsGrid());
+  // 193-196) here a collection is passed as a new item, otherwise it will pass the reference and change it directly
+  List<Product> get items {
+    return [..._items];
+  }
+
+// 193-196) the logic is to pass as much logic to the provider as possible and keep the widgets lean and clean.
+  Product findById(String id) {
+    return _items.firstWhere((prod) => prod.id == id);
+  }
+
+  // not sure why we left this commented?
+  void addProduct() {
+    // _items.add(value);
+    notifyListeners();
   }
 }
