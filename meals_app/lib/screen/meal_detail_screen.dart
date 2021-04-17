@@ -97,6 +97,17 @@ class MealDetailScreen extends StatelessWidget {
           ],
         ),
       ),
+      
+      //  177-178) this will delete the top most screen and once deleted, will return on the other side a 
+      // Future, which will have the param, mealId!
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.delete,
+        ),
+        onPressed: () {
+          Navigator.of(context).pop(mealId);
+        },
+      ),
     );
   }
 }

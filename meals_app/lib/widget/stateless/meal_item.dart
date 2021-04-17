@@ -10,6 +10,7 @@ class MealItem extends StatelessWidget {
   final int duration;
   final Complexity complexity;
   final Affordability affordability;
+  final Function removeItem;
 
   MealItem({
     // check id prop.
@@ -19,6 +20,7 @@ class MealItem extends StatelessWidget {
     @required this.affordability,
     @required this.complexity,
     @required this.duration,
+    @required this.removeItem,
   });
 
   String get complexityText {
@@ -59,7 +61,16 @@ class MealItem extends StatelessWidget {
   // + it points to a widget, not a page!
   void selectMeal(BuildContext context) {
     // 170-171) we also push some args necessary for the details page through arguments!
-    Navigator.of(context).pushNamed(MealDetailScreen.routeName, arguments: id);
+    Navigator.of(context)
+        .pushNamed(MealDetailScreen.routeName, arguments: id)
+        // 177-178) here once the display is destroyed, it returns a callback, which will return info 
+        // to the category meals screen, which will delete the item , which was loaded
+        // [IMP/] Usecase of FUTURE!
+        .then((result) {
+      if (result != null) {
+        removeItem(result);
+      }
+    });
   }
 
   @override

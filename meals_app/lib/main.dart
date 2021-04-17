@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:meals_app/screen/bottom_tabs_screen.dart';
 import 'package:meals_app/screen/category_meals_screen.dart';
+import 'package:meals_app/screen/filters_screen.dart';
 import 'package:meals_app/screen/meal_detail_screen.dart';
+import 'package:meals_app/screen/tabs_screen.dart';
 import './screen/categories_screen.dart';
 
 void main() {
@@ -53,11 +56,15 @@ class MyApp extends StatelessWidget {
         },
         routes: {
           // default is pointing towards the screen.
-          '/': (ctx) => CategoriesScreen(),
+          // 173-174) here we`ll replacethe categoriesScreen with the tabController!
+          // choose between tabController or bottomTabScreen widget!
+          '/': (ctx) => BottomTabScreen(), // 17
           // 162-164)  we`ll have a routeName, so its more readable.
           CategoryMealsScreen.routeName: (ctx) => CategoryMealsScreen(),
           // 170-171 we register mealDetailScreen here
           MealDetailScreen.routeName: (ctx) => MealDetailScreen(),
+          // 174-175) filtersScreen is added
+          FiltersScreen.routeName: (ctx) => FiltersScreen(),
         });
   }
 }
