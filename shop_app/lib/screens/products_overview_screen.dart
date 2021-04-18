@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/widgets/app_drawer.dart';
 
 import '../providers/cart.dart';
 import '../widgets/badge.dart';
@@ -59,58 +60,60 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('MyShop'),
-          // 200-203 actions were added :
-          // one for drop_down menu
-          // another for re-direction to cart, which will be done later on.
-          actions: <Widget>[
-            // 200-203) [imp/] dropdown !
-            PopupMenuButton(
-              // 200-203) with this you change the icon to selected favourite or not
-              onSelected: (FilterOptions selectedValue) {
-                setState(() {
-                  if (selectedValue == FilterOptions.Favorites) {
-                    _showOnlyFavorites = true;
-                  } else {
-                    _showOnlyFavorites = false;
-                  }
-                });
-              },
+      appBar: AppBar(
+        title: Text('MyShop'),
+        // 200-203 actions were added :
+        // one for drop_down menu
+        // another for re-direction to cart, which will be done later on.
+        actions: <Widget>[
+          // 200-203) [imp/] dropdown !
+          PopupMenuButton(
+            // 200-203) with this you change the icon to selected favourite or not
+            onSelected: (FilterOptions selectedValue) {
+              setState(() {
+                if (selectedValue == FilterOptions.Favorites) {
+                  _showOnlyFavorites = true;
+                } else {
+                  _showOnlyFavorites = false;
+                }
+              });
+            },
+            icon: Icon(
+              Icons.more_vert,
+            ),
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                child: Text('Only Favorites'),
+                value: FilterOptions.Favorites,
+              ),
+              PopupMenuItem(
+                child: const Text('Show All'),
+                value: FilterOptions.All,
+              ),
+            ],
+          ),
+          // 200-203) here it listens for changes in the object, and rebuilds the count, in case some are added.
+          Consumer<Cart>(
+            builder: (_, cart, ch) => Badge(
+              child: ch,
+              value: cart.itemCount.toString(),
+            ),
+            child: IconButton(
               icon: Icon(
-                Icons.more_vert,
+                Icons.shopping_cart,
               ),
-              itemBuilder: (_) => [
-                PopupMenuItem(
-                  child: Text('Only Favorites'),
-                  value: FilterOptions.Favorites,
-                ),
-                PopupMenuItem(
-                  child: const Text('Show All'),
-                  value: FilterOptions.All,
-                ),
-              ],
+              onPressed: () {
+                // 204-207) a redirect to cartScreen is added.
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
             ),
-            // 200-203) here it listens for changes in the object, and rebuilds the count, in case some are added.
-            Consumer<Cart>(
-              builder: (_, cart, ch) => Badge(
-                child: ch,
-                value: cart.itemCount.toString(),
-              ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.shopping_cart,
-                ),
-                onPressed: () {
-                  // 204-207) a redirect to cartScreen is added.
-                  Navigator.of(context).pushNamed(CartScreen.routeName);
-                },
-              ),
-            ),
-          ],
-        ),
-        
-        // 204-207) favorites are added here for filter.
-        body: ProductsGrid(_showOnlyFavorites));
+          ),
+        ],
+      ),
+
+      // 204-207) favorites are added here for filter.
+      body: ProductsGrid(_showOnlyFavorites),
+      drawer: AppDrawer(),
+    );
   }
 }

@@ -57,9 +57,8 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
-
 // 203-207) new actions for the listeners.
-double get totalAmount {
+  double get totalAmount {
     var total = 0.0;
     _items.forEach((key, cartItem) {
       total += cartItem.price * cartItem.quantity;
@@ -67,9 +66,14 @@ double get totalAmount {
     return total;
   }
 
-
-void removeItem(String productId) {
+  void removeItem(String productId) {
     _items.remove(productId);
+    notifyListeners();
+  }
+
+// 208-214) => addedfunc for clearing all items, once order is finished
+  void clear() {
+    _items = {};
     notifyListeners();
   }
 }

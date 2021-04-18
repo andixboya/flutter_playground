@@ -5,7 +5,9 @@ import 'package:shop_app/providers/products.dart';
 import 'package:shop_app/screens/product_detail_screen.dart';
 import 'package:shop_app/screens/products_overview_screen.dart';
 
+import 'providers/orders.dart';
 import 'screens/cart_screen.dart';
+import 'screens/orders_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -27,6 +29,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: Cart(),
         ),
+        // 208-214) => and we provide possibility for listening of context related to orders.
+        ChangeNotifierProvider.value(
+          value: Orders(),
+        )
       ],
       child: MaterialApp(
           title: 'MyShop',
@@ -41,6 +47,8 @@ class MyApp extends StatelessWidget {
             ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
             // 205-207) the route is added for cart.
             CartScreen.routeName: (ctx) => CartScreen(),
+            // 208-214) =>  route for orderScreen
+            OrdersScreen.routeName: (ctx) => OrdersScreen(),
           }),
     );
   }
