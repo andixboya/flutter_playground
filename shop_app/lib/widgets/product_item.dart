@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shop_app/providers/product.dart';
+import 'package:shop_app/providers/cart.dart';
 import 'package:shop_app/screens/product_detail_screen.dart';
 
 class ProductItem extends StatelessWidget {
-  final String id;
-  final String title;
-  final String imageUrl;
+  // 197) [IMP/] if you are using providers pattern, you won`t need ANY of these!!!! no constructors!
+  // final String id;
+  // final String title;
+  // final String imageUrl;
 
-  ProductItem(this.id, this.title, this.imageUrl);
+  // ProductItem(this.id, this.title, this.imageUrl);
 
   @override
   Widget build(BuildContext context) {
-    
-     // 185-193) => used to clip (round) the edges of the rectangular
+    // 19
+
+    // 196-199) => here we can extract the info, and use CONSUMER to LOCALLY reload widgets which are on this level!
+    //[imp/] and that way the need for properties from above is eliminated and is kept within the model itself, (it gets leaner!)
+    final product = Provider.of<Product>(context, listen: false);
+
+    // 200-203) here subscription for cart is added, because it is necessary to know
+    final cart = Provider.of<Cart>(context, listen: false);
+    // 185-193) => used to clip (round) the edges of the rectangular
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       // 185-193) => nice looking tile widget (like listViewTile), but specifically for girdView
@@ -23,38 +34,48 @@ class ProductItem extends StatelessWidget {
             Navigator.of(context).pushNamed(
               ProductDetailScreen.routeName,
               // 192-193) => here we pass arguments , istead of adding them to constructor (as direct link.)
-              arguments: id,
+              arguments: product.id,
             );
           },
-          
           child: Image.network(
-            imageUrl,
+            product.imageUrl,
             // 185-193)=> important as it resizes the image to fit the whole container.
             fit: BoxFit.cover,
           ),
         ),
         //185-193) => also nice feature of the GridTile component!
-        
+
         footer: GridTileBar(
           backgroundColor: Colors.black87,
-          //185-193) => actionBar (or action) on the left side 
-          leading: IconButton(
-            icon: Icon(Icons.favorite),
-            color: Theme.of(context).accentColor,
-            onPressed: () {},
+          //185-193) => actionBar (or action) on the left side
+
+          // 196-199) with consumer, you can isolate the rebuild to be applied for specific widgets that need the change notification.
+          // ctx (not sure if we need, product is the new subscribed product change, while child is something you defined which WILL NOT BE REBUILT
+          // and you can put it within consumer, to isolate change AGAIN optimization!)
+          leading: Consumer<Product>(
+            builder: (ctx, product, child) => IconButton(
+              icon: Icon(
+                  product.isFavorite ? Icons.favorite : Icons.favorite_border),
+              color: Theme.of(context).accentColor,
+              onPressed: () {},
+            ),
           ),
           //185-193) => text in the middle of the action.
           title: Text(
-            title,
+            product.title,
             textAlign: TextAlign.center,
           ),
-          //185-193) => actionBar (or action) on the right side 
+          //185-193) => actionBar (or action) on the right side
           trailing: IconButton(
             icon: Icon(
               Icons.shopping_cart,
             ),
-            onPressed: () {},
-          //185-193) => theme consumtion of the action.
+            // 200-203) here the state is linked with that of the cart ,
+            // otherwise we would have to drag all of the propreties through constructors and widgets and they all would have to rebuild.
+            onPressed: () {
+              cart.addItem(product.id, product.price, product.title);
+            },
+            //185-193) => theme consumtion of the action.
             color: Theme.of(context).accentColor,
           ),
         ),

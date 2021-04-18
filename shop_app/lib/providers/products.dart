@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shop_app/models/product.dart';
+import 'package:shop_app/providers/product.dart';
 
 // 193-196) this is like the state providr class, whic need ChangeNotifier 
 // in order to notify the selected widgets.
 // this can by absolutely anything and then you access it 
-class Products with ChangeNotifier {
+// the type of provider, depends on this mixin!
+class Products with ChangeNotifier { 
   List<Product> _items = [
     Product(
       id: 'p1',
