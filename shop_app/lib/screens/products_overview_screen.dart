@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart.dart';
 import '../widgets/badge.dart';
 import '../widgets/products_grid.dart';
+import 'cart_screen.dart';
 
 enum FilterOptions {
   Favorites,
@@ -100,11 +101,16 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 icon: Icon(
                   Icons.shopping_cart,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  // 204-207) a redirect to cartScreen is added.
+                  Navigator.of(context).pushNamed(CartScreen.routeName);
+                },
               ),
             ),
           ],
         ),
-        body: ProductsGrid());
+        
+        // 204-207) favorites are added here for filter.
+        body: ProductsGrid(_showOnlyFavorites));
   }
 }

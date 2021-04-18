@@ -51,6 +51,11 @@ class Products with ChangeNotifier {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
+// 204-207) favorites are added here for filter.
+  List<Product> get favoriteItems {
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
+  }
+
   // not sure why we left this commented?
   void addProduct() {
     // _items.add(value);

@@ -4,12 +4,19 @@ import 'package:shop_app/providers/products.dart';
 import 'package:shop_app/widgets/product_item.dart';
 
 class ProductsGrid extends StatelessWidget {
+  
+  // 203-207) this is for the favourites if they are shown/not
+  final bool showFavs;
+  ProductsGrid(this.showFavs);
+
+
+
   @override
   Widget build(BuildContext context) {
     // [imp/] 193-196) this is how the provider is accessed! With the generic class, you access it as a <generic> type.
     // and it is the only one that gets rebuilt.
     final productsData = Provider.of<Products>(context);
-    final products = productsData.items;
+    final products = showFavs ? productsData.favoriteItems : productsData.items;
 
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),

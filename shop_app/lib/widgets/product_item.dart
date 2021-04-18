@@ -57,7 +57,10 @@ class ProductItem extends StatelessWidget {
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
               color: Theme.of(context).accentColor,
-              onPressed: () {},
+              onPressed: () {
+                // 204-207) here i`ve forgotten to add the actual action...
+                product.toggleFavoriteStatus();
+              },
             ),
           ),
           //185-193) => text in the middle of the action.
