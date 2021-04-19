@@ -77,6 +77,22 @@ class ProductItem extends StatelessWidget {
             // otherwise we would have to drag all of the propreties through constructors and widgets and they all would have to rebuild.
             onPressed: () {
               cart.addItem(product.id, product.price, product.title);
+
+              // 216) both accessible from context,
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              // 216) creates a popup which can be used for manipulation/cancellation (just this example)
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: const Text(
+                  'Added item to cart!',
+                ),
+                duration: const Duration(seconds: 2),
+                action: SnackBarAction(
+                  label: 'UNDO',
+                  onPressed: () {
+                    cart.removeSingleItem(product.id);
+                  },
+                ),
+              ));
             },
             //185-193) => theme consumtion of the action.
             color: Theme.of(context).accentColor,
