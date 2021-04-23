@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/providers/product.dart';
 
-// 193-196) this is like the state providr class, whic need ChangeNotifier 
+// 193-196) this is like the state providr class, whic need ChangeNotifier
 // in order to notify the selected widgets.
-// this can by absolutely anything and then you access it 
+// this can by absolutely anything and then you access it
 // the type of provider, depends on this mixin!
-class Products with ChangeNotifier { 
+class Products with ChangeNotifier {
   List<Product> _items = [
     Product(
       id: 'p1',
@@ -57,8 +57,33 @@ class Products with ChangeNotifier {
   }
 
   // not sure why we left this commented?
-  void addProduct() {
-    // _items.add(value);
+  void addProduct(Product product) {
+    final newProduct = Product(
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      id: DateTime.now().toString(),
+    );
+    _items.add(newProduct);
+    // _items.insert(0, newProduct); // at the start of the list
+    notifyListeners();
+  }
+
+  // 232-233) update of products logic (here in state)
+  void updateProduct(String id, Product newProduct) {
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    if (prodIndex >= 0) {
+      _items[prodIndex] = newProduct;
+      notifyListeners();
+    } else {
+      print('...');
+    }
+  }
+
+// 233) delete of products logic (here in state)
+  void deleteProduct(String id) {
+    _items.removeWhere((prod) => prod.id == id);
     notifyListeners();
   }
 }

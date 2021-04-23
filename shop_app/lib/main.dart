@@ -8,6 +8,7 @@ import 'package:shop_app/screens/user_products_screen.dart';
 
 import 'providers/orders.dart';
 import 'screens/cart_screen.dart';
+import 'screens/edit_product_screen.dart';
 import 'screens/orders_screen.dart';
 
 void main() => runApp(MyApp());
@@ -52,6 +53,9 @@ class MyApp extends StatelessWidget {
             OrdersScreen.routeName: (ctx) => OrdersScreen(),
             // 219-220) => inclusion route for ... UserProductScrren 
             UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
+
+            //221-223) => route added when we click add new product ( it will pop it)
+            EditProductScreen.routeName: (ctx) => EditProductScreen(),
           }),
     );
   }
