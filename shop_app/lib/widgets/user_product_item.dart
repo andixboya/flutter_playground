@@ -33,7 +33,7 @@ class UserProductItem extends StatelessWidget {
               },
               color: Theme.of(context).primaryColor,
             ),
-            // 232-233) link to edit screen.
+            // 232-233) link to edit screen. 
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () {
