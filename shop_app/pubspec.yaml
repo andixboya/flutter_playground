@@ -23,8 +23,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # for provider state management (global state)
   provider: ^5.0.0
+  # for dates
   intl: ^0.17.0
+  # for http requests.
+  http: ^0.13.1
 
 
   # The following adds the Cupertino Icons font to your application.

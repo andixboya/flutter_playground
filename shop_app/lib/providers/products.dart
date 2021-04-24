@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shop_app/providers/product.dart';
+
+import 'package:http/http.dart' as http;
 
 // 193-196) this is like the state providr class, whic need ChangeNotifier
 // in order to notify the selected widgets.
@@ -57,17 +61,50 @@ class Products with ChangeNotifier {
   }
 
   // not sure why we left this commented?
-  void addProduct(Product product) {
-    final newProduct = Product(
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      id: DateTime.now().toString(),
-    );
-    _items.add(newProduct);
-    // _items.insert(0, newProduct); // at the start of the list
-    notifyListeners();
+  //  as of 240-245) it will be done with query to firbase (not in-memory)
+  // void addProduct(Product product) {
+  //   final newProduct = Product(
+  //     title: product.title,
+  //     description: product.description,
+  //     price: product.price,
+  //     imageUrl: product.imageUrl,
+  //     id: DateTime.now().toString(),
+  //   );
+  //   _items.add(newProduct);
+  //   // _items.insert(0, newProduct); // at the start of the list
+  //   notifyListeners();
+  // }
+
+  Future<void> addProduct(Product product) {
+    // 240-245) here , instead of string, it is necessary to insert a uri object!
+    // const url = 'https://flutter-update.firebaseio.com/products.json';
+    // [imp/] first arg is the base, second is the url, add json always, its fire base specific!
+    final url = Uri.https('flutter-update.firebaseio.com', '/products.json');
+    return http
+        .post(
+      url,
+      // 240-245) data.convert library is used to convert the object into string format and vise versa!
+      body: json.encode({
+        'title': product.title,
+        'description': product.description,
+        'imageUrl': product.imageUrl,
+        'price': product.price,
+        'isFavorite': product.isFavorite,
+      }),
+    )
+        .then((response) {
+      final newProduct = Product(
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        id: json.decode(response.body)['name'],
+      );
+      // 240-245) => here the in-memory is still used, probably the db will be used for load of products as well!
+      _items.add(newProduct);
+      // _items.insert(0, newProduct); // at the start of the list
+      notifyListeners();
+    });
   }
 
   // 232-233) update of products logic (here in state)

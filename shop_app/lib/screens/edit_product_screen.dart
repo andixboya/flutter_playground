@@ -40,6 +40,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     'imageUrl': '',
   };
   var _isInit = true;
+  var _isLoading = false;
 
   // // 225)this will cause refresh on the image widget
   // 227-229)  validation
@@ -64,15 +65,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
     // this triggers onSaveSubmit on each form_field, and within each field they fill up the  props.
     _form.currentState.save();
+    // 240-245 => isLoading is used for pending check display of loading widget.
+    setState(() {
+      _isLoading = true;
+    });
+
     // 230) here the products(provider) does the job of saving our state (in-memory).
     // 232-233) => the edit logic is added as well, depending if we have id or not.
     if (_editedProduct.id != null) {
       Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
+      Navigator.of(context).pop();
     } else {
-      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct)
+          // 240-245) => here with the help of future, the loadingWidget is visible!
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop();
+      });
     }
-    Navigator.of(context).pop();
   }
 
 // [imp/] the nodes are futures and you must dispose of them
@@ -118,6 +131,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         _imageUrlController.text = _editedProduct.imageUrl;
       }
     }
+
     _isInit = false;
     super.didChangeDependencies();
   }
@@ -135,177 +149,111 @@ class _EditProductScreenState extends State<EditProductScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        // 221-223) intro to Form (later it will be shown how to extract info from it.)
-        child: Form(
-          //227-229) => the id needs tobe linked, otherwise they would not work!
-          key: _form,
-          // 221-223) its a bad idea to use listView , because in smaller windows/screens it will cut off your input fields
-          // because of the "smart algorithms"
-          child: ListView(
-            children: <Widget>[
-              // 221-223) one simple type of field
-              TextFormField(
-                //232-233) addition of initValue , which is added from initState , in case its empty!
-                initialValue: _initValues['title'],
+      // 240-245) loader widget is added here, after the post request to the server!
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              // 221-223) intro to Form (later it will be shown how to extract info from it.)
+              child: Form(
+                //227-229) => the id needs tobe linked, otherwise they would not work!
+                key: _form,
+                // 221-223) its a bad idea to use listView , because in smaller windows/screens it will cut off your input fields
+                // because of the "smart algorithms"
+                child: ListView(
+                  children: <Widget>[
+                    // 221-223) one simple type of field
+                    TextFormField(
+                      //232-233) addition of initValue , which is added from initState , in case its empty!
+                      initialValue: _initValues['title'],
 
-                // 221-223) with decoration you can "style" your input with different ways ( check docs.)
-                decoration: InputDecoration(labelText: 'Title'),
+                      // 221-223) with decoration you can "style" your input with different ways ( check docs.)
+                      decoration: InputDecoration(labelText: 'Title'),
 
-                // 221-223) here is a combination of how to transfer the focus on to the next field.
-                textInputAction: TextInputAction.next,
-                // [imp/] 221-223) logic is that focusScope is pointing towards priceFocusNode , and its attached to the second node
-                // at least so I understood.
-                //  next removes the focus i think (and with focusNode the focus is transfered to some pointed node!)
-                onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_priceFocusNode);
-                },
-                // 227-229) validation is just some func,called within each field.
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please provide a value.';
-                  }
-                  return null;
-                },
-                // 227-229) method called in different cases (for example within form.save)
-                onSaved: (value) {
-                  // the value of the previous products are  preserved along side the new value of each field!
-                  _editedProduct = Product(
-                    title: value,
-                    price: _editedProduct.price,
-                    description: _editedProduct.description,
-                    imageUrl: _editedProduct.imageUrl,
-
-                    // 232-233) addition of product on save (in case there is one)
-                    id: _editedProduct.id,
-                    isFavorite: _editedProduct.isFavorite,
-                  );
-                },
-              ),
-              TextFormField(
-                // 232-233) => again initValue
-                initialValue: _initValues['price'],
-                decoration: InputDecoration(labelText: 'Price'),
-                // 221-223) its again important to set the type of keyborad,
-                // so that the user doesn`t have to do it himself
-
-                textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.number,
-                focusNode: _priceFocusNode,
-                onFieldSubmitted: (_) {
-                  // 224) here the input will be redirected to the text description field.
-                  FocusScope.of(context).requestFocus(_descriptionFocusNode);
-                },
-                // 227-229) more validation
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter a price.';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number.';
-                  }
-                  if (double.parse(value) <= 0) {
-                    return 'Please enter a number greater than zero.';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _editedProduct = Product(
-                      title: _editedProduct.title,
-                      price: double.parse(value),
-                      description: _editedProduct.description,
-                      imageUrl: _editedProduct.imageUrl,
-                      // 232-233) preserving the state from edit!
-                      id: _editedProduct.id,
-                      isFavorite: _editedProduct.isFavorite);
-                },
-              ),
-
-              // 224) different input field for longer text.
-              TextFormField(
-                initialValue: _initValues['description'],
-                decoration: InputDecoration(labelText: 'Description'),
-                // 224) also different keyboard type
-                maxLines: 3,
-                keyboardType: TextInputType.multiline,
-                focusNode: _descriptionFocusNode,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter a description.';
-                  }
-                  if (value.length < 10) {
-                    return 'Should be at least 10 characters long.';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _editedProduct = Product(
-                    title: _editedProduct.title,
-                    price: _editedProduct.price,
-                    description: value,
-                    imageUrl: _editedProduct.imageUrl,
-                    id: _editedProduct.id,
-                    isFavorite: _editedProduct.isFavorite,
-                  );
-                },
-              ),
-
-              // 225) you can add any type of widgets, not only formFields
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    width: 100,
-                    height: 100,
-                    margin: EdgeInsets.only(
-                      top: 8,
-                      right: 10,
-                    ),
-                    // 225) for styling , you keep forgetting this!
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 1,
-                        color: Colors.grey,
-                      ),
-                    ),
-
-                    // 225) here the controller is used so it is know, whther an image is loadeded or not
-                    child: _imageUrlController.text.isEmpty
-                        ? Text('Enter a URL')
-                        : FittedBox(
-                            child: Image.network(
-                              _imageUrlController.text,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                  ),
-                  // 225) wrappedin expanded , because otherwise it would occupy all of the space and would cause a problem.
-                  Expanded(
-                    child: TextFormField(
-                      decoration: InputDecoration(labelText: 'Image URL'),
-                      keyboardType: TextInputType.url,
-                      textInputAction: TextInputAction.done,
-                      // 225)  here, the controller from above is attached!
-                      controller: _imageUrlController,
-                      // 225) also a node is attached here, so the input can be forced, upon focus out.
-                      focusNode: _imageUrlFocusNode,
-                      // 227-229) finally  here the submit is called , like the one in the button on top!
+                      // 221-223) here is a combination of how to transfer the focus on to the next field.
+                      textInputAction: TextInputAction.next,
+                      // [imp/] 221-223) logic is that focusScope is pointing towards priceFocusNode , and its attached to the second node
+                      // at least so I understood.
+                      //  next removes the focus i think (and with focusNode the focus is transfered to some pointed node!)
                       onFieldSubmitted: (_) {
-                        _saveForm();
+                        FocusScope.of(context).requestFocus(_priceFocusNode);
                       },
+                      // 227-229) validation is just some func,called within each field.
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'Please enter an image URL.';
+                          return 'Please provide a value.';
                         }
-                        if (!value.startsWith('http') &&
-                            !value.startsWith('https')) {
-                          return 'Please enter a valid URL.';
+                        return null;
+                      },
+                      // 227-229) method called in different cases (for example within form.save)
+                      onSaved: (value) {
+                        // the value of the previous products are  preserved along side the new value of each field!
+                        _editedProduct = Product(
+                          title: value,
+                          price: _editedProduct.price,
+                          description: _editedProduct.description,
+                          imageUrl: _editedProduct.imageUrl,
+
+                          // 232-233) addition of product on save (in case there is one)
+                          id: _editedProduct.id,
+                          isFavorite: _editedProduct.isFavorite,
+                        );
+                      },
+                    ),
+                    TextFormField(
+                      // 232-233) => again initValue
+                      initialValue: _initValues['price'],
+                      decoration: InputDecoration(labelText: 'Price'),
+                      // 221-223) its again important to set the type of keyborad,
+                      // so that the user doesn`t have to do it himself
+
+                      textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.number,
+                      focusNode: _priceFocusNode,
+                      onFieldSubmitted: (_) {
+                        // 224) here the input will be redirected to the text description field.
+                        FocusScope.of(context)
+                            .requestFocus(_descriptionFocusNode);
+                      },
+                      // 227-229) more validation
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please enter a price.';
                         }
-                        if (!value.endsWith('.png') &&
-                            !value.endsWith('.jpg') &&
-                            !value.endsWith('.jpeg')) {
-                          return 'Please enter a valid image URL.';
+                        if (double.tryParse(value) == null) {
+                          return 'Please enter a valid number.';
+                        }
+                        if (double.parse(value) <= 0) {
+                          return 'Please enter a number greater than zero.';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _editedProduct = Product(
+                            title: _editedProduct.title,
+                            price: double.parse(value),
+                            description: _editedProduct.description,
+                            imageUrl: _editedProduct.imageUrl,
+                            // 232-233) preserving the state from edit!
+                            id: _editedProduct.id,
+                            isFavorite: _editedProduct.isFavorite);
+                      },
+                    ),
+
+                    // 224) different input field for longer text.
+                    TextFormField(
+                      initialValue: _initValues['description'],
+                      decoration: InputDecoration(labelText: 'Description'),
+                      // 224) also different keyboard type
+                      maxLines: 3,
+                      keyboardType: TextInputType.multiline,
+                      focusNode: _descriptionFocusNode,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Please enter a description.';
+                        }
+                        if (value.length < 10) {
+                          return 'Should be at least 10 characters long.';
                         }
                         return null;
                       },
@@ -313,20 +261,90 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         _editedProduct = Product(
                           title: _editedProduct.title,
                           price: _editedProduct.price,
-                          description: _editedProduct.description,
-                          imageUrl: value,
+                          description: value,
+                          imageUrl: _editedProduct.imageUrl,
                           id: _editedProduct.id,
                           isFavorite: _editedProduct.isFavorite,
                         );
                       },
                     ),
-                  ),
-                ],
+
+                    // 225) you can add any type of widgets, not only formFields
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          width: 100,
+                          height: 100,
+                          margin: EdgeInsets.only(
+                            top: 8,
+                            right: 10,
+                          ),
+                          // 225) for styling , you keep forgetting this!
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: Colors.grey,
+                            ),
+                          ),
+
+                          // 225) here the controller is used so it is know, whther an image is loadeded or not
+                          child: _imageUrlController.text.isEmpty
+                              ? Text('Enter a URL')
+                              : FittedBox(
+                                  child: Image.network(
+                                    _imageUrlController.text,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                        ),
+                        // 225) wrappedin expanded , because otherwise it would occupy all of the space and would cause a problem.
+                        Expanded(
+                          child: TextFormField(
+                            decoration: InputDecoration(labelText: 'Image URL'),
+                            keyboardType: TextInputType.url,
+                            textInputAction: TextInputAction.done,
+                            // 225)  here, the controller from above is attached!
+                            controller: _imageUrlController,
+                            // 225) also a node is attached here, so the input can be forced, upon focus out.
+                            focusNode: _imageUrlFocusNode,
+                            // 227-229) finally  here the submit is called , like the one in the button on top!
+                            onFieldSubmitted: (_) {
+                              _saveForm();
+                            },
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Please enter an image URL.';
+                              }
+                              if (!value.startsWith('http') &&
+                                  !value.startsWith('https')) {
+                                return 'Please enter a valid URL.';
+                              }
+                              if (!value.endsWith('.png') &&
+                                  !value.endsWith('.jpg') &&
+                                  !value.endsWith('.jpeg')) {
+                                return 'Please enter a valid image URL.';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _editedProduct = Product(
+                                title: _editedProduct.title,
+                                price: _editedProduct.price,
+                                description: _editedProduct.description,
+                                imageUrl: value,
+                                id: _editedProduct.id,
+                                isFavorite: _editedProduct.isFavorite,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
