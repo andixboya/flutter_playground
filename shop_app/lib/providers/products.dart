@@ -75,24 +75,23 @@ class Products with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     // 240-245) here , instead of string, it is necessary to insert a uri object!
     // const url = 'https://flutter-update.firebaseio.com/products.json';
     // [imp/] first arg is the base, second is the url, add json always, its fire base specific!
-    final url = Uri.https('flutter-update.firebaseio.com', '/products.json');
-    return http
-        .post(
-      url,
-      // 240-245) data.convert library is used to convert the object into string format and vise versa!
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'imageUrl': product.imageUrl,
-        'price': product.price,
-        'isFavorite': product.isFavorite,
-      }),
-    )
-        .then((response) {
+    final url = Uri.https(
+        'flutter-shop-app-6b626-default-rtdb.firebaseio.com', '/products.json');
+    try {
+      final response = await http.post(url,
+          // 240-245) data.convert library is used to convert the object into string format and vise versa!
+          body: json.encode({
+            'title': product.title,
+            'description': product.description,
+            'imageUrl': product.imageUrl,
+            'price': product.price,
+            'isFavorite': product.isFavorite,
+          }));
+
       final newProduct = Product(
         title: product.title,
         description: product.description,
@@ -104,7 +103,13 @@ class Products with ChangeNotifier {
       _items.add(newProduct);
       // _items.insert(0, newProduct); // at the start of the list
       notifyListeners();
-    });
+    } catch (err) {
+      // 246) throwing erors and handling them (in case sth. goes wrong with the http call.)
+      // 247) in 246 it was with catchError, but this is WAAAY more readible!
+
+      print(err);
+      throw err;
+    }
   }
 
   // 232-233) update of products logic (here in state)

@@ -58,7 +58,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
 // 227-229)  some func, which is called on submit on top as button or after the final field is written.
-  void _saveForm() {
+// 247) making it async, so it can consumer the future!
+  void _saveForm() async {
     final isValid = _form.currentState.validate();
     if (!isValid) {
       return;
@@ -77,14 +78,41 @@ class _EditProductScreenState extends State<EditProductScreen> {
           .updateProduct(_editedProduct.id, _editedProduct);
       Navigator.of(context).pop();
     } else {
-      Provider.of<Products>(context, listen: false).addProduct(_editedProduct)
-          // 240-245) => here with the help of future, the loadingWidget is visible!
-          .then((_) {
+      try {
+        //[IMP/] 247) this is 1000 times cleaner than the other way (with then/catch!!!!)
+        await Provider.of<Products>(context, listen: false)
+            // 240-245) => here with the help of future, the loadingWidget is visible!
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('An error occurred!'),
+            content: Text('Something went wrong.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  // 246)  not sure why... it doesn`t go to the then , again? (since another future is returned but w.e.)
+                  Navigator.of(ctx).pop();
+                  // the below should not be here?
+                  // setState(() {
+                  //   _isLoading = false;
+                  // });
+                },
+              )
+            ],
+          ),
+        );
+      } finally {
         setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop();
-      });
+      }
+
+      // 246) how to handle the error and pop an error message, in case sth. goes wrong (this is kind of poor but w.e.)
+
     }
   }
 
