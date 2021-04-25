@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/providers/products.dart';
 import 'package:shop_app/widgets/app_drawer.dart';
 
 import '../providers/cart.dart';
@@ -54,8 +55,40 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   //         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
   //   ),
   // ];
-
+  
+  
   var _showOnlyFavorites = false;
+  // 248-249) both props are used for spinner display, while waiting for data to be fetched.
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void initState() {
+    // 248-249) didChange method will be used to initialize the collection data.
+    // Provider.of<Products>(context).fetchAndSetProducts(); // WON'T WORK!
+
+    // Future.delayed(Duration.zero).then((_) {
+    //   Provider.of<Products>(context).fetchAndSetProducts();
+    // });
+    super.initState();
+  }
+
+// 248-249) used for initialization of the products, instead of in-memory dependency.
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<Products>(context).fetchAndSetProducts().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +143,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           ),
         ],
       ),
-
-      // 204-207) favorites are added here for filter.
-      body: ProductsGrid(_showOnlyFavorites),
+      // 248-249) loader widget is used while waiting for data fetch.
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          // 204-207) favorites are added here for filter.
+          : ProductsGrid(_showOnlyFavorites),
       drawer: AppDrawer(),
     );
   }

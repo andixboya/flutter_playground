@@ -17,6 +17,15 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
+  // 248-249) logic extraction and direct conversino into a model (without nested models within it).
+  Product.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        title = json['title'],
+        description = json['description'],
+        price = json['price'],
+        imageUrl = json['imageUrl'],
+        isFavorite = json['isFavourite'];
+
   void toggleFavoriteStatus() {
     isFavorite = !isFavorite;
     notifyListeners();

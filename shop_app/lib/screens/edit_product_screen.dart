@@ -73,8 +73,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     // 230) here the products(provider) does the job of saving our state (in-memory).
     // 232-233) => the edit logic is added as well, depending if we have id or not.
+    
     if (_editedProduct.id != null) {
-      Provider.of<Products>(context, listen: false)
+      // 252) update of product is now async as well with http.
+      await Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
       Navigator.of(context).pop();
     } else {
@@ -104,7 +106,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-      } finally {
+      }
+      //  finally {
+      //   setState(() {
+      //     _isLoading = false;
+      //   });
+      //   Navigator.of(context).pop();
+      // }
+      //  finally {
+      // 252) since the code is async,we finally is not necessary.
         setState(() {
           _isLoading = false;
         });
@@ -114,8 +124,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       // 246) how to handle the error and pop an error message, in case sth. goes wrong (this is kind of poor but w.e.)
 
     }
-  }
 
+  
 // [imp/] the nodes are futures and you must dispose of them
 // that is why we use the widget onDestroy cycle to get rid of them.
   @override

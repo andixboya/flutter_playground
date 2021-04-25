@@ -15,6 +15,7 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = Scaffold.of(context);
     return ListTile(
       title: Text(title),
       leading: CircleAvatar(
@@ -36,8 +37,18 @@ class UserProductItem extends StatelessWidget {
             // 232-233) link to edit screen. 
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {
-                Provider.of<Products>(context, listen: false).deleteProduct(id);
+              onPressed: () async {
+                try{
+                  // 252) deletion case from http.
+                  await Provider.of<Products>(context, listen: false).deleteProduct(id);
+                }catch (err){
+                  scaffold.showSnackBar(
+                    SnackBar(
+                      content: Text('Deleting failed!', textAlign: TextAlign.center,),
+                    ),
+                  );
+                }
+                
               },
               color: Theme.of(context).errorColor,
             ),
