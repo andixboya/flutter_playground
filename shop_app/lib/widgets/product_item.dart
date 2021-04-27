@@ -59,6 +59,7 @@ class ProductItem extends StatelessWidget {
               color: Theme.of(context).accentColor,
               onPressed: () {
                 // 204-207) here i`ve forgotten to add the actual action...
+                // 255) interesting, but it does not need to be returned or anything..., actually it just needs to be executed i guess?
                 product.toggleFavoriteStatus();
               },
             ),

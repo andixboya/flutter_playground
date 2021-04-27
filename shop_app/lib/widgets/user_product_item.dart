@@ -15,6 +15,7 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 253) here some possible bug, because in catch it re-sets context and it must be taken from outside to preserve the context?
     final scaffold = Scaffold.of(context);
     return ListTile(
       title: Text(title),
@@ -34,21 +35,25 @@ class UserProductItem extends StatelessWidget {
               },
               color: Theme.of(context).primaryColor,
             ),
-            // 232-233) link to edit screen. 
+            // 232-233) link to edit screen.
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () async {
-                try{
+                try {
                   // 252) deletion case from http.
-                  await Provider.of<Products>(context, listen: false).deleteProduct(id);
-                }catch (err){
+                  // 253) its actually changed there!
+                  await Provider.of<Products>(context, listen: false)
+                      .deleteProduct(id);
+                } catch (err) {
                   scaffold.showSnackBar(
                     SnackBar(
-                      content: Text('Deleting failed!', textAlign: TextAlign.center,),
+                      content: Text(
+                        'Deleting failed!',
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   );
                 }
-                
               },
               color: Theme.of(context).errorColor,
             ),

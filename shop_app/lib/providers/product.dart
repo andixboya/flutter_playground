@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Product with ChangeNotifier {
   final String id;
@@ -17,17 +19,36 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  // 248-249) logic extraction and direct conversino into a model (without nested models within it).
-  Product.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
-        title = json['title'],
-        description = json['description'],
-        price = json['price'],
-        imageUrl = json['imageUrl'],
-        isFavorite = json['isFavourite'];
+  // 255) the status is changed in firebase with http
+  // void toggleFavoriteStatus() {
+  //   isFavorite = !isFavorite;
+  //   notifyListeners();
+  // }
+  void _setFavValue(bool newValue) {
+    isFavorite = newValue;
+    notifyListeners();
+  }
 
-  void toggleFavoriteStatus() {
+// 255) the status is changed in firebase with http
+  Future<void> toggleFavoriteStatus() async {
+    final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
+    // https://flutter-shop-app-6b626-default-rtdb.firebaseio.com/products
+    final url = Uri.https('flutter-shop-app-6b626-default-rtdb.firebaseio.com',
+        '/products/$id.json');
+    try {
+      final response = await http.patch(
+        url,
+        body: json.encode({
+          'isFavorite': isFavorite,
+        }),
+      );
+      if (response.statusCode >= 400) {
+        _setFavValue(oldStatus);
+      }
+    } catch (error) {
+      _setFavValue(oldStatus);
+    }
   }
 }
