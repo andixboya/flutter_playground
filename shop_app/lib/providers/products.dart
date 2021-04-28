@@ -12,6 +12,16 @@ import 'package:http/http.dart' as http;
 // this can by absolutely anything and then you access it
 // the type of provider, depends on this mixin!
 class Products with ChangeNotifier {
+  final String authToken;
+
+  //270) from now on since every provdier/service will need the token to make proper requests,
+  // they will be added/injected through the constructor and
+  // they will be re-built every single time the auth is rebuilt.
+  // remember to add the auth token (in our case to url) for each request, so that the api is accessible!
+  // also the previous state must be kept, so the main state that is kept in this 'provider/service' must be re-initializezd.
+
+  Products(this.authToken, this._items);
+
   // 248-249) from here onwards, the items will be loaded from fireBase with fetchAndSet method.
   List<Product> _items = [];
   //  [
@@ -119,7 +129,11 @@ class Products with ChangeNotifier {
   // 248-249) data fetching, I wonder if I change the model, will it map it , itself?)
   Future<void> fetchAndSetProducts() async {
     final url = Uri.https(
-        'flutter-shop-app-6b626-default-rtdb.firebaseio.com', '/products.json');
+        'flutter-shop-app-6b626-default-rtdb.firebaseio.com',
+        //  270) here the token is added the access token is accessed through access_token not auth like in the vid.
+        // finally done!
+        '/products.json',
+        {'auth': authToken});
     try {
       final response = await http.get(url);
       // 248-249) this should be tested, wether it works, or not? OKay, its not working...
