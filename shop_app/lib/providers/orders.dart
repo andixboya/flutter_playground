@@ -21,6 +21,10 @@ class OrderItem {
 }
 
 class Orders with ChangeNotifier {
+  // 271) adding the token through consumer from outside.
+  Orders(this.authToken, this._orders);
+
+  final String authToken;
   List<OrderItem> _orders = [];
 
   List<OrderItem> get orders {
@@ -31,7 +35,9 @@ class Orders with ChangeNotifier {
   // as of 256) its stored in firebase.
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url = Uri.https(
-        'flutter-shop-app-6b626-default-rtdb.firebaseio.com', '/orders.json');
+        'flutter-shop-app-6b626-default-rtdb.firebaseio.com', '/orders.json',
+        // 271) adding token
+        {'auth': authToken});
     final timestamp = DateTime.now();
 
     // 256) creation of the model, too tired to think on that...
@@ -66,7 +72,9 @@ class Orders with ChangeNotifier {
 // 257) orders will be fetched from firebase as well
   Future<void> fetchAndSetOrders() async {
     final url = Uri.https(
-        'flutter-shop-app-6b626-default-rtdb.firebaseio.com', '/orders.json');
+        'flutter-shop-app-6b626-default-rtdb.firebaseio.com', '/orders.json',
+        // 271) adding token.
+        {'auth': authToken});
     final response = await http.get(url);
     final List<OrderItem> loadedOrders = [];
     final extractedData = json.decode(response.body) as Map<String, dynamic>;

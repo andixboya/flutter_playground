@@ -24,11 +24,15 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String get userId {
+    return _userId;
+  }
+
 // 267) sign in url => https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=[API_KEY]
 
 // 266) signup func
   Future<void> signup(String email, String password) async {
-    return _authenticate(email, password, 'signupNewUser');
+    return _authenticate(email, password, 'signUp');
   }
 
   // 267) login func

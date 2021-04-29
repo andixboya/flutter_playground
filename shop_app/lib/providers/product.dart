@@ -30,19 +30,21 @@ class Product with ChangeNotifier {
   }
 
 // 255) the status is changed in firebase with http
-  Future<void> toggleFavoriteStatus() async {
+  // 272) userId is added, so the fav. is kept in a separate collection for each user!
+  Future<void> toggleFavoriteStatus(String authToken, String userId) async {
     final oldStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
-    // https://flutter-shop-app-6b626-default-rtdb.firebaseio.com/products
-    final url = Uri.https('flutter-shop-app-6b626-default-rtdb.firebaseio.com',
-        '/products/$id.json');
+    final url = Uri.https(
+        'flutter-shop-app-6b626-default-rtdb.firebaseio.com',
+        // 272) userId is added, so the fav. is kept in a separate collection for each user!
+        '/userFavorites/$userId/$id.json',
+        // 271) adding token
+        {'auth': authToken});
     try {
-      final response = await http.patch(
+      final response = await http.put(
         url,
-        body: json.encode({
-          'isFavorite': isFavorite,
-        }),
+        body: json.encode(isFavorite),
       );
       if (response.statusCode >= 400) {
         _setFavValue(oldStatus);

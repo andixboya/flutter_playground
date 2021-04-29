@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
           builder: null,
           update: (ctx, auth, prevProducts) => Products(
               auth.token,
+              auth.userId,
               // 270) also here the intial state is null, so a check is necessary!
               prevProducts == null ? [] : prevProducts.items),
           create: null,
@@ -47,9 +48,11 @@ class MyApp extends StatelessWidget {
           value: Cart(),
         ),
         // 208-214) => and we provide possibility for listening of context related to orders.
-        ChangeNotifierProvider.value(
-          value: Orders(),
-        )
+        // 271) addition of auth dep. so orders get the token.
+        ChangeNotifierProxyProvider<Auth, Orders>(
+            create: null,
+            update: (ctx, auth, previousOrders) => Orders(auth.token,
+                previousOrders == null ? [] : previousOrders.orders))
       ],
       // 269) listener is added here for the changes within auth. so that this app is guarded and rebuilt
       // because otherwise the resources would never be loaded and it would be stuck on reload screen.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/providers/auth.dart';
 import 'package:shop_app/providers/product.dart';
 import 'package:shop_app/providers/cart.dart';
 import 'package:shop_app/screens/product_detail_screen.dart';
@@ -14,11 +15,11 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 19
-
     // 196-199) => here we can extract the info, and use CONSUMER to LOCALLY reload widgets which are on this level!
     //[imp/] and that way the need for properties from above is eliminated and is kept within the model itself, (it gets leaner!)
     final product = Provider.of<Product>(context, listen: false);
+    // 271) adding listener to extractt info from auth, but no reload is necessary!
+    final authData = Provider.of<Auth>(context, listen: false);
 
     // 200-203) here subscription for cart is added, because it is necessary to know
     final cart = Provider.of<Cart>(context, listen: false);
@@ -60,7 +61,7 @@ class ProductItem extends StatelessWidget {
               onPressed: () {
                 // 204-207) here i`ve forgotten to add the actual action...
                 // 255) interesting, but it does not need to be returned or anything..., actually it just needs to be executed i guess?
-                product.toggleFavoriteStatus();
+                product.toggleFavoriteStatus(authData.token, authData.userId);
               },
             ),
           ),
