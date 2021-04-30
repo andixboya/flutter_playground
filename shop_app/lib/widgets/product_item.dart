@@ -38,11 +38,19 @@ class ProductItem extends StatelessWidget {
               arguments: product.id,
             );
           },
-          child: Image.network(
-            product.imageUrl,
-            // 185-193)=> important as it resizes the image to fit the whole container.
+
+          // 285) placeholder is shown and then the actual photo is displayed with some smooth
+          // fadeIn effect.
+          child: FadeInImage(
+            placeholder: AssetImage('assets/images/product-placeholder.png'),
+            image: NetworkImage(product.imageUrl),
             fit: BoxFit.cover,
           ),
+
+          //  Image.network(
+          //   product.imageUrl,
+          //   // 185-193)=> important as it resizes the image to fit the whole container.
+          //   fit: BoxFit.cover,
         ),
         //185-193) => also nice feature of the GridTile component!
 
