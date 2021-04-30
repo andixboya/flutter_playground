@@ -41,10 +41,13 @@ class ProductItem extends StatelessWidget {
 
           // 285) placeholder is shown and then the actual photo is displayed with some smooth
           // fadeIn effect.
-          child: FadeInImage(
-            placeholder: AssetImage('assets/images/product-placeholder.png'),
-            image: NetworkImage(product.imageUrl),
-            fit: BoxFit.cover,
+          child: Hero(
+            tag: product.id,
+            child: FadeInImage(
+              placeholder: AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(product.imageUrl),
+              fit: BoxFit.cover,
+            ),
           ),
 
           //  Image.network(

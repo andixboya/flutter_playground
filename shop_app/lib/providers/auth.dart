@@ -83,8 +83,8 @@ class Auth with ChangeNotifier {
       // 269) once the data is loaded successfully , the widgets are signaled to refresh
       // (with consumer on materialApp() main widget)
 
-    //278) here the data needs to be written, silly!
-    final prefs = await SharedPreferences.getInstance();
+      //278) here the data needs to be written, silly!
+      final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
         {
           'token': _token,
@@ -94,7 +94,6 @@ class Auth with ChangeNotifier {
       );
       prefs.setString('userData', userData);
 
-
       notifyListeners();
     } catch (error) {
       throw error;
@@ -102,7 +101,7 @@ class Auth with ChangeNotifier {
   }
 
 // 275) logout func: simply delete the token from the service.
-  void logout() {
+  Future<void> logout() async {
     _token = null;
     _userId = null;
     _expiryDate = null;
@@ -112,6 +111,12 @@ class Auth with ChangeNotifier {
       _authTimer = null;
     }
     notifyListeners();
+    // 290) this is at some earlier stage, i`ve forgotten to add it .Otherwise
+    //  your app. won`t remove the cookies/state from the device`s memory
+    
+    final prefs = await SharedPreferences.getInstance();
+    // prefs.remove('userData');
+    prefs.clear();
   }
 
   // 276) autLogout execution, once you logiin, it should start ticking

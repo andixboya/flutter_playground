@@ -31,6 +31,13 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context)
                   .pushReplacementNamed(OrdersScreen.routeName);
+              // [imp/] 290) how to use it as single routes (but instead it would be better if its set on all routes as part of the theme)
+              // below instead of just giving the route , you pass CustomRoute with builder method in it!
+              // Navigator.of(context).pushReplacement(
+              //   CustomRoute(
+              //     builder: (ctx) => OrdersScreen(),
+              //   ),
+              // );
             },
           ),
           // 219-220) addition of user_products_item re-routing from the side drawer:
