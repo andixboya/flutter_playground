@@ -22,8 +22,10 @@ class OrderItem {
 
 class Orders with ChangeNotifier {
   // 271) adding the token through consumer from outside.
-  Orders(this.authToken, this._orders);
+  Orders(this.authToken, this.userId, this._orders);
 
+  // 275) client is added so the service can separate orders per client.
+  final String userId;
   final String authToken;
   List<OrderItem> _orders = [];
 
@@ -35,7 +37,9 @@ class Orders with ChangeNotifier {
   // as of 256) its stored in firebase.
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url = Uri.https(
-        'flutter-shop-app-6b626-default-rtdb.firebaseio.com', '/orders.json',
+        // 275) orders are separated per client.
+        'flutter-shop-app-6b626-default-rtdb.firebaseio.com',
+        '/orders/$userId.json',
         // 271) adding token
         {'auth': authToken});
     final timestamp = DateTime.now();
@@ -71,8 +75,9 @@ class Orders with ChangeNotifier {
 
 // 257) orders will be fetched from firebase as well
   Future<void> fetchAndSetOrders() async {
-    final url = Uri.https(
-        'flutter-shop-app-6b626-default-rtdb.firebaseio.com', '/orders.json',
+    // 275) orders are separated per userId.
+    final url = Uri.https('flutter-shop-app-6b626-default-rtdb.firebaseio.com',
+        '/orders/$userId.json',
         // 271) adding token.
         {'auth': authToken});
     final response = await http.get(url);

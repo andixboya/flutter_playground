@@ -6,6 +6,7 @@ import 'package:shop_app/providers/products.dart';
 import 'package:shop_app/screens/auth_screen.dart';
 import 'package:shop_app/screens/product_detail_screen.dart';
 import 'package:shop_app/screens/products_overview_screen.dart';
+import 'package:shop_app/screens/splash_screen.dart';
 import 'package:shop_app/screens/user_products_screen.dart';
 
 import 'providers/orders.dart';
@@ -51,7 +52,10 @@ class MyApp extends StatelessWidget {
         // 271) addition of auth dep. so orders get the token.
         ChangeNotifierProxyProvider<Auth, Orders>(
             create: null,
-            update: (ctx, auth, previousOrders) => Orders(auth.token,
+            update: (ctx, auth, previousOrders) => Orders(
+                auth.token,
+                // 275) userId is added for orders separation.
+                auth.userId,
                 previousOrders == null ? [] : previousOrders.orders))
       ],
       // 269) listener is added here for the changes within auth. so that this app is guarded and rebuilt
@@ -67,7 +71,22 @@ class MyApp extends StatelessWidget {
             ),
             // as if 264) home is switched to auth (which will grant authorization!)
             // [imp/] 269) here a check is added, if the user is auth. he will be redirected to normal screen, otherwise to login!
-            home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+
+            // logic: if user is authenticated, go to starting page, otherwise make and attempt with futureBuilder (init state)
+            // and check if there are any credentials to take from the device`s memory and if there is none, then just
+            // load auth screen and use splashScreen while waiting/loading or checking for the info within the device`s storage!
+            home: auth.isAuth
+                ? ProductsOverviewScreen()
+                // [imp/] 277) here it will make an attempt to login automatically with another futureBuilder check (init)
+                // a second ternary operator (ugly buy does the trick).
+
+                : FutureBuilder(
+                    future: auth.tryAutoLogin(),
+                    builder: (ctx, authResultSnapshot) =>
+                        authResultSnapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? SplashScreen()
+                            : AuthScreen()),
             routes: {
               ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
               // 205-207) the route is added for cart.

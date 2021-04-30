@@ -29,6 +29,8 @@ dependencies:
   intl: ^0.17.0
   # for http requests.
   http: ^0.13.1
+  # for access to store within the device
+  shared_preferences: ^2.0.5
 
 
   # The following adds the Cupertino Icons font to your application.
