@@ -10,30 +10,46 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
 
 class ImageInput extends StatefulWidget {
+  final Function onSelectImage;
+  ImageInput(this.onSelectImage);
   @override
   _ImageInputState createState() => _ImageInputState();
 }
 
 class _ImageInputState extends State<ImageInput> {
+  
   File _storedImage;
 
   Future<void> _takePicture() async {
     // 298) here the image is taken as future
-    final imageFile = await ImagePicker.pickImage(
+    // ImagePicker.pickImage old syntax for picker
+    final image = ImagePicker();
+    final imageFile = await image.getImage(
       // 298) option, which camera the device should use in order to take the picture.
       source: ImageSource.camera,
       maxWidth: 600,
     );
+    // 299-300) checkup in case of no pic selection.
+    if (imageFile == null) {
+      return;
+    }
+
     setState(() {
       // here its just stored in the app`s memory
-      _storedImage = imageFile;
+      // here i think it needeed path, not imageFile directly.
+      // imageFile was previously.
+      _storedImage = File(imageFile.path);
     });
     // 298) the directory of the app, where it is kept.
     final appDir = await syspaths.getApplicationDocumentsDirectory();
     // 298) base file path name
     final fileName = path.basename(imageFile.path);
     // 298) here the photo is coppied to the directory of the app +'the file`s name'.ß
-    final savedImage = await imageFile.copy('${appDir.path}/$fileName');
+    // not sure if this was
+    final savedImage = await _storedImage.copy('${appDir.path}/$fileName');
+    // this is probably for later on?
+    // 299-300) oh... this is where you pass the data to the above... widget... damn.
+    widget.onSelectImage(savedImage);
   }
 
   @override
